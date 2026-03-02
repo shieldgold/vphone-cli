@@ -365,15 +365,20 @@ if [[ -z "$MG_CONTAINER" ]]; then
 fi
 MG_CACHE="$MG_CONTAINER/Library/Caches/com.apple.MobileGestalt.plist"
 
-# Write override plist with iPhone 17 Pro Max marketing name
+# Write override plist with iPhone 17 Pro Max marketing name.
+# MobileGestalt keys are obfuscated: base64(MD5("MGCopyAnswer" + keyName)).
+#   Z/dqyWS6OZTRy10UcmUAhw  = marketing-name
+#   j9Th5smJpdztHwc+i39zIg  = MarketingProductName
 ssh_cmd "printf '%s\n' \
 '<?xml version=\"1.0\" encoding=\"UTF-8\"?>' \
 '<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">' \
 '<plist version=\"1.0\">' \
 '<dict>' \
-'  <key>CacheData</key>' \
+'  <key>CacheExtra</key>' \
 '  <dict>' \
-'    <key>ArtworkDeviceProductDescription</key>' \
+'    <key>Z/dqyWS6OZTRy10UcmUAhw</key>' \
+'    <string>iPhone 17 Pro Max</string>' \
+'    <key>j9Th5smJpdztHwc+i39zIg</key>' \
 '    <string>iPhone 17 Pro Max</string>' \
 '  </dict>' \
 '</dict>' \

@@ -75,7 +75,7 @@ ldid_sign() {
 safe_detach() {
     local mnt="$1"
     if mount | grep -q "$mnt"; then
-        sudo hdiutil detach -force "$mnt" 2>/dev/null || true
+        hdiutil detach -force "$mnt" 2>/dev/null || true
     fi
 }
 
@@ -182,9 +182,9 @@ safe_detach "$MNT_APPOS"
 mkdir -p "$MNT_SYSOS" "$MNT_APPOS"
 
 echo "  Mounting SystemOS..."
-sudo hdiutil attach -mountpoint "$MNT_SYSOS" "$SYSOS_DMG" -owners off
+hdiutil attach -mountpoint "$MNT_SYSOS" "$SYSOS_DMG" -owners off
 echo "  Mounting AppOS..."
-sudo hdiutil attach -mountpoint "$MNT_APPOS" "$APPOS_DMG" -owners off
+hdiutil attach -mountpoint "$MNT_APPOS" "$APPOS_DMG" -owners off
 
 # Mount device rootfs (tolerate already-mounted)
 echo "  Mounting device rootfs rw..."

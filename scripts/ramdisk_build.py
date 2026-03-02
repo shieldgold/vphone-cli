@@ -234,26 +234,26 @@ def build_ramdisk(restore_dir, im4m_path, vm_dir, input_dir, output_dir, temp_di
     try:
         # Mount, create expanded copy
         print("  Mounting base ramdisk...")
-        run(["sudo", "hdiutil", "attach", "-mountpoint", mountpoint,
+        run(["hdiutil", "attach", "-mountpoint", mountpoint,
              ramdisk_raw, "-owners", "off"])
 
         print("  Creating expanded ramdisk (254 MB)...")
-        run(["sudo", "hdiutil", "create", "-size", "254m",
+        run(["hdiutil", "create", "-size", "254m",
              "-imagekey", "diskimage-class=CRawDiskImage",
              "-format", "UDZO", "-fs", "APFS", "-layout", "NONE",
-             "-srcfolder", mountpoint, "-copyuid", "root",
+             "-srcfolder", mountpoint,
              ramdisk_custom])
-        run(["sudo", "hdiutil", "detach", "-force", mountpoint])
+        run(["hdiutil", "detach", "-force", mountpoint])
 
         # Mount expanded, inject SSH
         print("  Mounting expanded ramdisk...")
-        run(["sudo", "hdiutil", "attach", "-mountpoint", mountpoint,
+        run(["hdiutil", "attach", "-mountpoint", mountpoint,
              ramdisk_custom, "-owners", "off"])
 
         print("  Injecting SSH tools...")
         gtar = os.path.join(input_dir, "tools/gtar")
         ssh_tar = os.path.join(input_dir, "ssh.tar.gz")
-        run(["sudo", gtar, "-x", "--no-overwrite-dir",
+        run([gtar, "-x", "--no-overwrite-dir",
              "-f", ssh_tar, "-C", mountpoint])
 
         # Remove unnecessary files
@@ -298,11 +298,11 @@ def build_ramdisk(restore_dir, im4m_path, vm_dir, input_dir, output_dir, temp_di
         print(f"  [+] trustcache.img4")
 
     finally:
-        subprocess.run(["sudo", "hdiutil", "detach", "-force", mountpoint],
+        subprocess.run(["hdiutil", "detach", "-force", mountpoint],
                        capture_output=True)
 
     # Shrink and sign ramdisk
-    run(["sudo", "hdiutil", "resize", "-sectors", "min", ramdisk_custom])
+    run(["hdiutil", "resize", "-sectors", "min", ramdisk_custom])
 
     print("  Signing ramdisk...")
     rd_im4p = os.path.join(temp_dir, "ramdisk.im4p")

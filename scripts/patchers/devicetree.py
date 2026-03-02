@@ -112,9 +112,10 @@ class DeviceTreePatcher:
             # Pad to fill entire allocated space
             new_bytes = new_bytes.ljust(padded, b"\x00")
 
-            # Write new length (clear syscfg flag, set actual length)
-            new_length = len(value) + 1  # include null terminator
-            struct.pack_into("<I", self.data, length_offset, new_length)
+            # Clear syscfg flag but KEEP original length to preserve DT layout.
+            # The DT parser computes padding as (length+3)&~3 to find the next
+            # property.  Changing length would shift all subsequent properties.
+            struct.pack_into("<I", self.data, length_offset, old_length)
 
             # Write new value
             self.data[value_offset:value_offset + padded] = new_bytes

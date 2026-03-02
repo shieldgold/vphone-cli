@@ -352,6 +352,35 @@ ssh_cmd "/bin/chmod 0644 /mnt1/System/Library/xpc/launchd.plist"
 
 echo "  [+] LaunchDaemons installed"
 
+# ═══════════ MOBILEGESTALT ══════════════════════════════════
+echo ""
+echo "[*] Writing MobileGestalt marketing name override..."
+
+# Find the MobileGestalt cache container on data volume (/mnt3)
+MG_CONTAINER=$(ssh_cmd "find /mnt3/containers/Shared/SystemGroup -maxdepth 1 -name 'systemgroup.com.apple.mobilegestaltcache' 2>/dev/null" || true)
+if [[ -z "$MG_CONTAINER" ]]; then
+    # Create the container structure if it doesn't exist
+    MG_CONTAINER="/mnt3/containers/Shared/SystemGroup/systemgroup.com.apple.mobilegestaltcache"
+    ssh_cmd "/bin/mkdir -p '$MG_CONTAINER/Library/Caches'"
+fi
+MG_CACHE="$MG_CONTAINER/Library/Caches/com.apple.MobileGestalt.plist"
+
+# Write override plist with iPhone 17 Pro Max marketing name
+ssh_cmd "printf '%s\n' \
+'<?xml version=\"1.0\" encoding=\"UTF-8\"?>' \
+'<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">' \
+'<plist version=\"1.0\">' \
+'<dict>' \
+'  <key>CacheData</key>' \
+'  <dict>' \
+'    <key>ArtworkDeviceProductDescription</key>' \
+'    <string>iPhone 17 Pro Max</string>' \
+'  </dict>' \
+'</dict>' \
+'</plist>' > '$MG_CACHE'"
+ssh_cmd "/bin/chmod 0644 '$MG_CACHE'"
+echo "  [+] MobileGestalt override written to $MG_CACHE"
+
 # ═══════════ CLEANUP ═════════════════════════════════════════
 echo ""
 echo "[*] Unmounting device filesystems..."
